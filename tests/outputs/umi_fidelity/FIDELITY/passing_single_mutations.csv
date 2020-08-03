@@ -1,0 +1,3 @@
+Sample,Chromosome,ClustOfVariants,Count,Coverage,ConfidentCoverage
+1_duplicated_sort_by_name,lambda,A85C,1,6.0,2.0
+1_duplicated_sort_by_name,lambda,C119G,1,6.0,2.0

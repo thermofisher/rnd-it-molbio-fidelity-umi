@@ -1,0 +1,22 @@
+{
+    "__default__": {
+        "name": "{rule}.{wildcards}",
+        "error": "logs/cluster/{rule}_{wildcards}.err",
+        "output": "logs/cluster/{rule}_{wildcards}.out",
+        "priority": "0"
+    },
+
+    "sortByName": {
+        "name": "{rule}.{wildcards}",
+        "error": "logs/cluster/{rule}_{wildcards}.err",
+        "output": "logs/cluster/{rule}_{wildcards}.out",
+        "priority": "-1000"
+    },
+
+    "indexing": {
+        "name": "{rule}",
+        "error": "logs/cluster/{rule}.err",
+        "output": "logs/cluster/{rule}.out",
+        "priority": "0"
+    }
+}

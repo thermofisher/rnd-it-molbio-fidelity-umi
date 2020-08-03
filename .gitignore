@@ -1,0 +1,92 @@
+# Logs and databases #
+######################
+**/*.log*
+*.sql
+*.sqlite
+logs
+
+# OS generated files #
+######################
+.Trashes
+
+# bachup files #
+################
+**/*~
+*~
+*#
+*.bak
+*.swp
+*.un~
+
+# IDE files #
+#############
+.classpath
+.project
+.settings
+.idea
+.metadata
+*.iml
+*.ipr
+*.orig
+.vscode
+
+# Bioinformatics output files #
+###############################
+*.snakemake
+output*/*
+output_*
+tmp_*
+!tests/outputs/*
+tmp*/*
+benchmarks/*
+*.jld
+*.amb
+*.ann
+*.bwt
+*.pac
+*.sa
+*.gem
+*.fa.info
+*.gem.info
+*.fai
+
+# adapterremoval outputs #
+##########################
+*.settings
+*.discarded
+*.singleton
+*.collapsed
+*.collapsed.truncated
+
+# jupyter notebook files #
+##########################
+
+**/*ipynb_checkpoints/
+*.ipynb
+
+#Tests Reference/Annotation files
+tests/references/*/*_ercc*
+tests/references/*/*_STAR_annotation*
+tests/references/*/*_masked.fa
+tests/references/*/*.gff
+tests/references/*/*.bed
+tests/references/*/*_transcripts.fa
+tests/references/*/*.dict
+
+#Rplot
+Rplots.pdf
+
+#transrate
+dependencies/transrate*
+
+STDIN.*
+core
+
+#python cache
+*.pyc
+
+.magicindex.json
+.ropeproject*
+
+#Sonar
+.scannerwork

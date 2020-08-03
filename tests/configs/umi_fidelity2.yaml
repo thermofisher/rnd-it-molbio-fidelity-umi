@@ -1,0 +1,36 @@
+MAIN:
+    INPUT_DIR: scripts/FidelityUMI.jl/tests
+    SAMPLES_ID: 2_duplicated
+    TMP_DIR: tmp_test_umi_fidelity2
+    OUT_DIR: output_test_umi_fidelity2
+    BENCHMARKING: bench_umi_fidelity2
+    LANE_RE: "L\\d\\d\\d_"
+    REFERENCE: scripts/FidelityUMI.jl/tests/umi_fidelity_short.fasta   # ...
+UMI_TOOLS:
+    run: True
+    umi_structure: "NNNNN"
+    additional_extract_params: " --bc-pattern2=NNNNN "
+    group_haming_distance: 1 # umi_tools group
+
+FIDELITY:
+    alignment_quality: 0
+    base_quality: 30 # min quality for mutation to be considered in read. [30]
+    cluster_size: 4 # min paired reads number in cluster.
+    max_mutations_per_read: 3
+    referece_mutation: 0.95 # how many same mutations at position to consider as reference mistake.
+    umi_split_string: "_"
+    umi_split_position: 2 # position of umi after spliting readname by umi string. 1 based.
+    report_mutations: True # if to write mutations to csv
+    genes_csv:  # provide genes csv file if whant to translate mutations Header: Chromosome,Start,End,Gene,Strand
+    genetic_code: 11 # Gene code from BioSequences.ncbi_trans_table [11]
+    additional_params: "--algorithm umi" # [ --algorithm umi, paired, position, naive]
+TRIMMING:
+    adapters: datasets/adapters/adapters.tsv       # format as for AdapterRemoval. Reverse must be rev compliment.
+    program: adapterremoval                     # [adapterremoval | bbduk | leave empty]
+    AdapterRemoval:
+        min_read_length: 0                             # [36]
+        quality_limit: 0                               # [25]
+        maximum_n_count_in_reads: 0                     # [1]
+        max_errors: 0.0                                 # [0.1]
+BWA:
+    non_default_params: " -r 0.1 -k 1 -A 1 -B 1 -O 1 -E 1 -L 1 -U 1 -T 1 -v 1 "

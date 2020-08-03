@@ -1,0 +1,14 @@
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - umi_tools=1.0.1
+ - matplotlib
+ - numpy
+ - pandas
+ - scipy
+ - cython
+ - pysam
+ - future
+ - regex
+ - matplotlib

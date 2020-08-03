@@ -1,0 +1,23 @@
+version: 1
+disable_existing_loggers: False
+
+formatters:
+    custom:
+        class: logging.Formatter
+        format: "%(asctime)s\t%(levelname)-8s\t%(message)s"
+
+handlers:
+    workflow_log:
+        formatter: custom
+        level: DEBUG
+        class: logging.FileHandler
+        filename: WORKFLOW_LOG_FILE
+    workflow_screen:
+        formatter: custom
+        level: DEBUG
+        class: logging.StreamHandler
+
+loggers:
+    custom_workflow:
+        handlers: [workflow_log,workflow_screen]
+        level: DEBUG

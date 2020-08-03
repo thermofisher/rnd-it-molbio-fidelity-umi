@@ -1,0 +1,2 @@
+Sample,TotalErrors,RawBases,TotalClusterBases,ConfidentBases,Frequency,MeanClustSize,MinClusterSize,MaxClusterSize,SumClusterSize,Mutations,Insertions,Deletions,Ns,TotalClusters,ClustersWithVars,TotalReads,FilteredReads,FilteredR1,FilteredR2
+1_duplicated_sort_by_name,2,1890,1070,214,0.009345794392523364,3.0,1,5,9,2,0,0,0,3,1,18,0,0,0

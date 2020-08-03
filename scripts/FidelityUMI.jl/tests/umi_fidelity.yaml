@@ -1,0 +1,350 @@
+#####################
+# Analysis switches #
+#####################
+
+# General workflows.
+sequencing_type: DNA-seq        # [DNA-seq, RNA-seq]
+raw_read_analysis: T      # [T, F]
+subsampling:       F      # [T, F]
+subsampling_analysis: F   # [T, F]
+alignment:            T   # [T, F]
+alignment_analysis:   F   # [T, F]
+rna_assembly_analysis: F   # [T, F]
+assembly_analysis:    F   # [T, F]
+variant_analysis:     F   # [T, F]
+fidelity:             T   # [T. F]
+uncovered_regions:    F   # [T. F]
+contamination_analysis: F  # [T. F]
+
+####################
+# General configs. #
+####################
+
+TYPE: PE  # SE - Single End, PE - Pair End.
+# Destination of FASTQ.GZ files.
+INPUT-DIR: scripts/FidelityUMI.jl/tests
+SAMPLES: 1_duplicated
+
+TMP-DIR: tmp_test_umi_fidelity
+OUT-DIR: output_test_umi_fidelity
+SCRATCH:   #directory for temp files of various programs that needs fast disk op, like sambamba
+BENCHMARKING: bench_umi_fidelity
+
+# regular expression that defines lane id portion in file names
+# !note that slahes are double for 'escape'
+lane_regex: "L\\d\\d\\d_"
+pcr_free:         # sample name for PCR free file
+
+# Reference genomic sequence.
+reference_dna: tests/references/fidelity/umi_fidelity.fasta   # ...
+reference_type: bacterial          # [bacterial, human]
+dataset_size: small      # [small, big] (bacterial -> small; human -> big)
+
+# Genome annotation.
+reference_gtf:  /media/root/ocean/Databases/hg19/Encode_annotation/gencode.v19.annotation.gtf
+reference_transcripts: /media/root/ocean/Databases/hg19/Encode_annotation/gencode.v19_transcripts_ercc.fa
+ribosomal_rna_bed: datasets/additional_data_RNA_seq/hg19_rRNA.bed
+albumin_bed: datasets/additional_data_RNA_seq/globins.bed
+
+# Excluding regions for GCbias, Stat bias and etc.
+# If mask = true. Marks regions with N in reference file.
+EXCLUDE:
+    reg: datasets/difficult_regions/mergedExcludeRegions.bed
+    mask: false
+
+# Fastqc options.
+FASTQC:
+    kmer_size: 5   # [5]
+
+# CPU and memory parameters for processes that are allowed to use them.
+MACHINE:
+    threads: 24
+    memory: 120
+    threads_star: 16
+
+# UMI params
+UMI-TOOLS:
+    run: True
+    deduplicate: False
+    umi_structure: "NNNNNNNNNN"
+    additional_extract_params: " --bc-pattern2=NNNNNNNNNN "
+    umi_samples_constraints:    # Umi samples and non umi samples regex. If first provided,
+    non_umi_constraints:        # second also should be for proper rules separation.
+    fidelity: True # do not use with deduplicate options.
+    group_haming_distance: 1 # umi_tools group
+    # FidelityUMI.jl params:
+    upper_bound: 1.0 # upper bound for the error to be considered in the cluster.
+    lower_bound: 0.8 # lower bound for the error to be considered in the cluster.
+    alignment_quality: 0
+    base_quality: 30 # min quality for mutation to be considered in read.
+    cluster_size: 4 # min paired reads number in cluster.
+    max_mutations_per_read: 3
+    referece_mutation: 0.95 # how many same mutations at position to consider as reference mistake.
+    umi_split_string: "_"
+    umi_split_position: 2 # position of umi after spliting readname by umi string. 1 based.
+
+# Seqtk options. Number of reads to subsample to. If left empty - subsample
+# to the minimum.
+SUBSAMPLING:
+    subsample_to:
+    subsample_for_adapters: 100000 # Subsamples only for adapter analysis. 100000
+
+# bbduk | AdapterRemoval options.
+TRIMMING:
+    adapters: datasets/adapters/adapters_reverse_compl.tsv       # format as for AdapterRemoval. Reverse must be rev compliment.
+    adaptremove: adapterremoval                     # [adapterremoval | bbduk | leave empty]
+    AdapterRemoval:
+        trimPolyA: False
+        min_read_length: 0                             # [36]
+        quality_limit: 0                               # [25]
+        maximum_n_count_in_reads: 0                     # [1]
+        max_errors: 0.0                                 # [0.1]
+    bbduk:
+        trimPolyA: True                               # If true add AAAAAAAAAAAAA to bbduk trimming.
+        ktrim: r                                      # [r]
+        k: 23                                         # [23]
+        mink: 11                                      # [11]
+        hdist: 1                                      # [1]
+        minlength: 50                                 # [50]
+        maxns: 1                                      # [1]
+        qtrim: r                                      # [r]
+        trimq: 15                                     # [15]
+        additional_params: " tpe tbo "                # [" tpe tbo "]
+        FORCE_TRIM_OPTIONS:                           # Another trimming step used for forced trim lengths. All other parameters are as previous.
+    polyAterminus:
+        samples:
+        minimum_length: 20                            # [20]
+        minimum_polyA_length: 10                      # [10]
+        additional_params: ""                         # [--use-precalculated-reference-transcripts-prefixes --include-polyA-in-output]
+
+DEDUPLICATE:
+    run: False                                      # [True, False]
+    program: picard                                # [picard, samtools]
+    remove_duplicates: True                        # [True, False] If true removes duplicates, false only marks dublicates.
+    additional_params: ""                          # passed to any of selected programs:
+
+START_BIAS:
+    run: False
+    win: 2000
+
+PRESEQ:
+    step: 100000
+    max_extrap: 5000000
+    seg_len: 10000                             # IF c_curve throws bam sorting error set this param higher.
+
+VARIANTS:
+    cnv_bins: datasets/CNVbins/bin1000.rds  # from QDNAseq package
+    snp_specific_region:                  # region for snp analysis (same as in bam file).
+    snp_qval: 30                            # phred score 30 - 0.001; 20 - 0.01 for snp detection
+    snp_dp: 6                               # min read depth
+    snp_bin_density: 1000000                  # For plotting
+    snp_ref_chunks: 1000000                 # Splits reference into chunks for parralel freebayes
+    snp_high_confident: /media/root/ocean/Databases/HUMAN/hg19/SNP_highconfident/GIAB_v332_highconf_chrfix.vcf.gz     # High confident variantions vcf file.
+
+# for gatk filter passed base quality
+CALLABILITY:
+    cpgs: datasets/difficult_regions/cpgs_genome_browser_hg19.bed
+    genes: datasets/difficult_regions/genes_uniprot_hg19.tsv
+    autosomes: datasets/difficult_regions/autosomes.bed
+    exons: datasets/difficult_regions/exons_hg19_uniprot_genome_browser.bed
+
+#Krona options.
+KRONA:
+    db: /media/root/ocean/Databases/kronaDB
+
+BLASTN:
+    db_nt: /media/root/ocean/Databases/nt/nt
+    min_read_count: 1000
+
+WEBLOGO:
+    max_bits: 0.1                   #Max bits for weblogo graph [2.0]
+
+#############################
+# DNA-seq specific configs. #
+#############################
+
+# Select aligner
+DNA:
+    aligner: bwa               # [bwa, Bowtie2, gem3]
+
+# BWA options.
+BWA:
+    non_default_params: " -r 1.0 -k 19 -M -B 6 -v 1 " # [-r 1.0 -k 19 -M -B 6 -v 1]
+
+# gem3 options
+GEM3:
+    additional_params: ""
+    match_score: 1
+    mismatch_penalty: 4
+    gap_open_penalty: 6
+    gap_extention: 1
+    max_template_length: 10000
+    samtools_threads: 3
+    index_threads: 12
+
+# Bowtie2 options.
+BOWTIE2:
+    non_default_params: " "
+
+# Freebayes options.
+FREEBAYES:
+    variant_regions: # [BED format file]
+
+# Coverage options.
+COVERAGE:
+    ref_chunks: 500   # [500]
+    regions: # [BED format file]
+    win_size: 50  # [50]
+
+# fidelity params for both get error rates jl and python versions
+FIDELITY:
+    max_polymorphism: 0.2     # [0.2]
+    min_coverage: 10               # [10]
+    max_mutations_in_read: 3  # [3]
+
+# CoverageDNAStats options
+DNA_GC:
+    gc_bias: true
+    bad_promoters: datasets/difficult_regions/bad_promoters.tsv # path to bad promoters tsv file
+    cpgs: datasets/difficult_regions/cpgs_genome_browser_hg19.tsv # path to CpG islands tsv file
+    genes: datasets/difficult_regions/genes_uniprot_hg19.tsv # path to genes+exons tsv/bed file
+    norm_cov_upper: 10  # upper limmit for normalized coverages in graphs, default 10.
+    sliding: 50
+    win_size: 100
+    uncovered_threashold: 0
+    ALIGN_QUALITY: 0   # reads will be filtered out with lower alignment quality
+    MIN_COVERAGE: 0    # Used for base callability calculation. Only bases with higher coverage will be calculated as callable.
+    mim_num_of_Ns: 0
+    # for plotting
+    minimum_number_of_windows_for_GC_analysis: 1000
+    NR_WIN_LIMIT: 20   # USE 80 for other analysis 20 is for tests. Minimum number of GC windows after filtering.
+    ERR_LIMIT: 0.05    # Threshold for relative error bar to cov. GC with err > ERR_LIMIT
+    COV_LIMIT: 4       # Coverage limit, means that GC with COV <= 0 and > COV_LIMIT will be filtered.
+
+# Picard options
+PICARD:
+    optical_dublicate_pixel_distance: 2500 # Picard default 100.  For the patterned flowcell models, 2500 is moreappropriate.
+
+#############################
+# RNA-seq specific configs. #
+#############################
+
+# Indicate lexogen QuantSeq5 FWD samples with python regex, for specific triming and analysis.
+# Also other samples should be indicated for separated analysis.
+QUANTSEQ:
+    sample_constraints:  #"Leg-visasRT-\\w+"
+    quantseq_constraints: #"Lex-visasRT-\\w+"
+    trim_bbduk: " k=13 ktrim=r forcetrimleft=11 useshortkmers=t mink=5 qtrim=t trimq=10 minlength=20 "
+
+RNA:
+    aligner: STAR   # [STAR, TopHat]
+
+STAR:
+    add_star_params: " " # ["--chimJunctionOverhangMin 20-outFilterMultimapNmax 20   --outFilterMismatchNmax 999  --outFilterMismatchNoverReadLmax 0.04   --alignIntronMin 20   --alignIntronMax 1000000   --alignMatesGapMax 1000000   --alignSJoverhangMin 8   --alignSJDBoverhangMin 1 --sjdbScore 1 "]
+    limitGenomeGenerateRAM: 33588712149
+
+# TopHat options.
+TOPHAT:
+    reference_dna: /media/root/ocean/Databases/hg19/Encode_annotation/genome_ercc
+    transcriptome_index:  /media/root/ocean/Databases/hg19/Encode_annotation/tophat_indices_ercc/gencode.v19.annotation_ercc
+    non_default_params: " "
+
+# Additional parameters for RNA seq.
+
+GENECOUNTER: FeatureCounts # QORTS
+
+QORTS:
+    length_limit: 1000 # Minimum length of pseudotranscript to analyse coverage eveness. Pseudotranscript - all fused exonic regions - a chosen gene or a set of genes to be analysed for coverage together. Default 1000
+    specific_genes_for_coverge_analysis: ERCC-00130
+    graph_label_for_specific_genes_for_coverge_analysis: "Gene ERCC-00130"
+
+#FeatureCounts setings
+FeatureCounts:
+    additional_params: " "
+
+
+#RSeQC coverage options
+RSeQC:
+    winCovSize: 1000
+
+# ERCC analysis.
+ERCC:
+    ercc_gtf: datasets/additional_data_RNA_seq/ERCC92.gtf
+    ercc_fasta: datasets/additional_data_RNA_seq/ERCC92.fa
+    ercc_concentrations: datasets/additional_data_RNA_seq/cms_095046.txt
+
+ERCCDASHBOARD:
+    sample_keys:  Leg Lex # keys allowing assignment to diferent groups
+    mix1_keys: HeLam #keys allowing assignment to mix1 anay file with this substring would be concidered as belonging to mix1
+    mix2_keys: UHmR #keys allowing assignment to mix2 anay file with this substring would be concidered as belonging to mix2
+
+#Deseq analysis
+DESEQ2:
+    sample_keys: Leg Lex  # keys allowing assignment to diferent groups
+    mix1_keys: HeLam #keys allowing assignment to mix1 anay file with this substring would be concidered as belonging to mix1
+    mix2_keys: UHmR   #keys allowing assignment to mix2 anay file with this substring would be concidered as belonging to mix2
+
+# GC bias analysis.
+GC_BIAS:
+    winsize: 100    # [100]
+    slidesize: 50   # [50]
+    min_cov: 30     # [30], minimal coverage of transcript to be analyzed.
+    norm_method: 9 # [1: analyzing only second thirdtile of transcript by mean normalization.
+                   #  2: analyzing only second thirdtile of transcript be fpkm normalization.
+                   #  3: analyzing only second thirdtile of transcript by mean normalization from full length transcript coverage.
+                   #  4: analyzing only second thirdtile of transcript by fpkm normalization from full length transcript counts.
+                   #  5: analyzing full length transcripts by mean normalization.
+                   #  6: analyzing full length transcripts by fpkm npormalization.
+                   #  7: analyzing only second thirdtile of transcript by median normalization.
+                   #  8: analyzing only second thirdtile of transcript by median normalization from full length transcript coverage.
+                   #  9: analyzing full length transcripts by median normalization.]
+
+####################
+# Annotation of TS #
+####################
+ANNOTATE-TS:
+    run: false
+    k: 10
+    m: 1
+    additional_params: "--cluster" # ["--cluster --verbose"]
+
+##################################
+# RNA Assembly ###################
+# de novo transcriptome assembly #
+##################################
+
+RNA-ASSEMBLY:
+    spades:
+        additional_params: "--phred-offset 64"
+        sample_specific_options:
+            truseq: "--ss-rf"
+            collibri: "--ss-fr"
+    trinity:
+        run: False
+        additional_params: " "
+        sample_specific_options:
+            truseq: "--SS_lib_type RF"
+            collibri: "--SS_lib_type FR"
+    # running only if reference fa and gtf provided.
+    quast:
+        additional_params: ""
+    busco:
+        threads: 8
+        e: 0.001
+        mode: transcriptome
+        lineage: /media/root/ocean/Databases/BUSCO/mammalia_odb9
+        additional_params: " --augustus_parameters '--singlestrand=true --protein=on --introns=on --start=on --stop=on --cds=on --codingseq=on --gff3=on --UTR=on' " # [ -sp, for furth. info read run_busco and augustus docs ]
+    blast:
+        threads: 6
+        e: 1e-5
+        max_target_seqs: 1
+        uniprot_db: /mnt/beegfs/Databases/Uniprot/uniprot_sprot.fasta
+    transrate:
+        distant_protein_reference: # reference evidence from good annotated related species. Better annotation is prefared vs closer specy.
+    pfam_scan:
+        threads: 6
+        db: /mnt/beegfs/Databases/PFAM/Pfam-A.hmm
+    cd_hit:
+        threads: 20
+        memory_in_MB: 120000
+        params: "-c 0.95 -n 8 -p 1 -g 1 -d 40"

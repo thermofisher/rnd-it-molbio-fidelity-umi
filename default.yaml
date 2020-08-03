@@ -1,0 +1,64 @@
+MAIN:
+    INPUT_DIR:
+    SAMPLES_ID:
+    TMP_DIR:
+    OUT_DIR:
+    BENCHMARKING:
+    LANE_RE: "L\\d\\d\\d_"
+    REFERENCE:
+
+# Fastqc options.
+FASTQC:
+    kmer_size: 5   # [5]
+
+# CPU and memory parameters for processes that are allowed to use them.
+MACHINE:
+    threads: 24
+    memory: 120
+
+# bbduk | AdapterRemoval options.
+
+TRIMMING:
+    adapters: datasets/adapters/adapters.tsv       # format as for AdapterRemoval. Reverse must be rev compliment.
+    program: bbduk                                 # [bbduk, adapterremoval]
+    AdapterRemoval:
+        min_read_length: 50                             # [50]
+        quality_limit: 30                               # [30]
+        maximum_n_count_in_reads: 1                     # [1]
+        max_errors: 0.1                                 # [0.1]
+    bbduk:
+        ktrim: r                                      # [r]
+        k: 12                                         # [12]
+        mink: 6                                       # [6]
+        hdist: 1                                      # [1]
+        minlength: 50                                 # [50]
+        maxns: 1                                      # [1]
+        qtrim: r                                      # [r]
+        trimq: 30                                     # [30]
+        additional_params: " tpe tbo " # [" tpe tbo "]
+        FORCE_TRIM_OPTIONS: " forcetrimleft=5 forcetrimright2=25 "  # Another trimming step used to force trimming on ends. All other bbduk parameters are as previous.
+
+UMI_TOOLS:
+    run: True
+    umi_structure: "NNNNNNNNNNNNNNNN"
+    additional_extract_params: " --bc-pattern2=NNNNNNNNNNNNNNNN "
+    group_haming_distance: 1 # umi_tools group
+
+FIDELITY:
+    alignment_quality: 60
+    base_quality: 30          # min quality for mutation to be considered in read. [30]
+    cluster_size: 3           # min paired reads number in cluster.
+    max_mutations_per_read: 3
+    referece_mutation: 0.95   # how many same mutations at position to consider as reference mistake.
+    umi_split_string: "_"
+    umi_split_position: 2     # position of umi after splitting read name by umi string. 1 based.
+    report_mutations: True    # if to write mutations to csv
+    genes_csv:                # provide genes csv file if want to translate mutations Header: Chromosome,Start,End,Gene,Strand
+    genetic_code: 11          # Gene code from BioSequences.ncbi_trans_table [11]
+    additional_params: "--algorithm umi" # [ --algorithm umi, paired, position, naive]
+    min_cluster_counts: 1     # Minimum count of clusters for the mutation to be reported to a single_mutations file.
+    min_mutation_coverage: 1  # Minimum confident coverage for the mutation to be reported to a single_mutations file.
+
+# BWA options.
+BWA:
+    non_default_params: " -r 1.0 -k 19 -M -B 6 -v 1" # [-r 1.0 -k 19 -M -B 6 -v 1]

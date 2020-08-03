@@ -1,0 +1,33 @@
+MAIN:
+    INPUT_DIR: scripts/FidelityUMI.jl/tests
+    SAMPLES_ID: dwgsim_umi_fidelity_errors_ren dwgsim_umi_fidelity_errors_with_background
+    TMP_DIR: tmp_test_umi_fidelity_paired
+    OUT_DIR: output_test_umi_fidelity_paired
+    BENCHMARKING: bench_umi_fidelity_paired
+    LANE_RE: "L\\d\\d\\d_"
+    REFERENCE: tests/references/fidelity/Lambda_chr.fasta   # ...
+
+UMI_TOOLS:
+    run: False
+FIDELITY:
+    alignment_quality: 0
+    base_quality: 0 # min quality for mutation to be considered in read. [30]
+    cluster_size: 1 # min paired reads number in cluster.
+    max_mutations_per_read: 10
+    referece_mutation: 0.95 # how many same mutations at position to consider as reference mistake.
+    umi_split_string: "_"
+    umi_split_position: 2 # position of umi after spliting readname by umi string. 1 based.
+    report_mutations: True # if to write mutations to csv
+    genes_csv:  # provide genes csv file if whant to translate mutations Header: Chromosome,Start,End,Gene,Strand
+    genetic_code: 11 # Gene code from BioSequences.ncbi_trans_table [11]
+    additional_params: "--algorithm paired" # [ --algorithm umi, paired, position, naive]
+
+# bbduk | AdapterRemoval options.
+TRIMMING:
+    adapters: datasets/adapters/adapters.tsv       # format as for AdapterRemoval. Reverse must be rev compliment.
+    program: adapterremoval                     # [adapterremoval | bbduk | leave empty]
+    AdapterRemoval:
+        min_read_length: 0                             # [36]
+        quality_limit: 0                               # [25]
+        maximum_n_count_in_reads: 0                     # [1]
+        max_errors: 0.0                                 # [0.1]

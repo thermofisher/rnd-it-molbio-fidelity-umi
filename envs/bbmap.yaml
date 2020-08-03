@@ -1,0 +1,6 @@
+channels:
+ - bioconda
+dependencies:
+ - bbmap=37.90
+ - ngsutils
+ - python
