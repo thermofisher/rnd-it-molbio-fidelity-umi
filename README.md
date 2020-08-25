@@ -1,18 +1,18 @@
-# MuA-based Molecular Indexing for Rare Mutation Detection by Next-Generation Sequencingn
+# MuA-based Molecular Indexing for Rare Mutation Detection by Next-Generation Sequencing
 
 ## Description
 
-This code was used to generate [MuA-based Molecular Indexing for Rare Mutation Detection by Next-Generation Sequencing]("") publication data.  
-Workflow is designed to evaluate and calculate true errors based on either on Unique Molecular Identifier (UMI) or mapping duplicates clusters.  
-This workflow is written in [snakemake](https://github.com/snakemake/snakemake) workflow manager.  
-Error calculation package is written in [julia](https://github.com/JuliaLang/Julia) programming language.  
+This code was used to generate [MuA-based Molecular Indexing for Rare Mutation Detection by Next-Generation Sequencing]("") publication data.
+Workflow is designed to evaluate and calculate true errors based on either on Unique Molecular Identifier (UMI) or mapping duplicates clusters.
+This workflow is written in [snakemake](https://github.com/snakemake/snakemake) workflow manager.
+Error calculation package is written in [julia](https://github.com/JuliaLang/Julia) programming language.
 Workflow also uses:
 
 1. [umi-tools](https://github.com/CGATOxford/UMI-tools) to extract and process UMI sequence information.
 
 1. [bwa-mem](https://github.com/lh3/bwa) algorithm for short pair end reads alignment to the reference.
 
-1. [sambamba](https://github.com/biod/sambamba) and [samtools](https://github.com/samtools/samtools) for aligned data sorting and filtering respectively.  
+1. [sambamba](https://github.com/biod/sambamba) and [samtools](https://github.com/samtools/samtools) for aligned data sorting and filtering respectively.
 
 DAG of a UMI-based errors calculation workflow rules:
 ![main workflow](imgs/umi_fidelity.svg)
@@ -91,7 +91,7 @@ DAG of a UMI-based errors calculation workflow rules:
 
 ## Configuration file explained
 
-Workflow checks if __must have__ parameters were provided. All other if not provided will be used from `defaul.yaml` file.  
+Workflow checks if __must have__ parameters were provided. All other if not provided will be used from `defaul.yaml` file.
 Thus your config file must contain at least these parameters:
 
 ```yaml
@@ -126,10 +126,10 @@ MAIN:
 
     ```yaml
     MAIN:
-        LANE_RE: "L\\d\\d\\d_"  # This would translate to L001 lane number for example. 
+        LANE_RE: "L\\d\\d\\d_"  # This would translate to L001 lane number for example.
     ```
 
-    > Illumina sequencing might split data by separate lanes. It is usually 'L\\d' or 'L\\d\\d\\d' where '\\d' is an integer.  
+    > Illumina sequencing might split data by separate lanes. It is usually 'L\\d' or 'L\\d\\d\\d' where '\\d' is an integer.
     > All files which do match sample id, lane, and read direction will be mergeg to generate single sequencing file which is not split by lanes.
 
 1. Default trimming program is `bbduk`. All parameter names listed in configuration file are exactly the same as it would be calling it from CLI.
@@ -148,7 +148,7 @@ MAIN:
         additional_extract_params: " --bc-pattern2=NNNNNNNNNNNNNNNN "
     ```
 
-    > You can also pass other `umi-tools` supported options here as a tring separated by spaces. 
+    > You can also pass other `umi-tools` supported options here as a tring separated by spaces.
 
 1. Available parameters for error calculations:
 
@@ -174,7 +174,7 @@ MAIN:
         cluster_size: 3
         ```
 
-        > If `naive` algorithm is selected then this filter option is omitted.  
+        > If `naive` algorithm is selected then this filter option is omitted.
         > Cluster in this case is defined either by umi sequences + mapping position (`umi` algorithm)
         > or just mapping position (`position` algorithm)
 
@@ -215,7 +215,7 @@ MAIN:
         additional_params: "--algorithm umi"
         ```
 
-        > Supported algorithms: naive, position, umi, paired.  
+        > Supported algorithms: naive, position, umi, paired.
         > More can be check with CLI --help option.
 
     1. To report mutations provide:
@@ -231,4 +231,4 @@ MAIN:
         ```yaml
         min_cluster_counts: 1     # Minimum count of clusters for the mutation to be reported to a single_mutations file.
         min_mutation_coverage: 1  # Minimum confident coverage for the mutation to be reported to a single_mutations file.
-        ```  
+        ```
