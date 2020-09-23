@@ -2,10 +2,10 @@
 
 ## Description
 
-This code was used to generate [MuA-based Molecular Indexing for Rare Mutation Detection by Next-Generation Sequencing]("") publication data.
-Workflow is designed to evaluate and calculate true errors based on either on Unique Molecular Identifier (UMI) or mapping duplicates clusters.
-This workflow is written in [snakemake](https://github.com/snakemake/snakemake) workflow manager.
-Error calculation package is written in [julia](https://github.com/JuliaLang/Julia) programming language.
+This code was used to generate [MuA-based Molecular Indexing for Rare Mutation Detection by Next-Generation Sequencing]("") publication data.  
+Workflow is designed to evaluate and calculate true errors based on either on Unique Molecular Identifier (UMI) or mapping duplicates clusters.  
+This workflow is written in [snakemake](https://github.com/snakemake/snakemake) workflow manager.  
+Error calculation package is written in [julia](https://github.com/JuliaLang/Julia) programming language.  
 Workflow also uses:
 
 1. [umi-tools](https://github.com/CGATOxford/UMI-tools) to extract and process UMI sequence information.
@@ -91,7 +91,7 @@ DAG of a UMI-based errors calculation workflow rules:
 
 ## Configuration file explained
 
-Workflow checks if __must have__ parameters were provided. All other if not provided will be used from `defaul.yaml` file.
+Workflow checks if __must have__ parameters were provided. All other if not provided will be used from `defaul.yaml` file.  
 Thus your config file must contain at least these parameters:
 
 ```yaml
@@ -129,7 +129,7 @@ MAIN:
         LANE_RE: "L\\d\\d\\d_"  # This would translate to L001 lane number for example.
     ```
 
-    > Illumina sequencing might split data by separate lanes. It is usually 'L\\d' or 'L\\d\\d\\d' where '\\d' is an integer.
+    > Illumina sequencing might split data by separate lanes. It is usually 'L\\d' or 'L\\d\\d\\d' where '\\d' is an integer.  
     > All files which do match sample id, lane, and read direction will be mergeg to generate single sequencing file which is not split by lanes.
 
 1. Default trimming program is `bbduk`. All parameter names listed in configuration file are exactly the same as it would be calling it from CLI.
@@ -174,8 +174,8 @@ MAIN:
         cluster_size: 3
         ```
 
-        > If `naive` algorithm is selected then this filter option is omitted.
-        > Cluster in this case is defined either by umi sequences + mapping position (`umi` algorithm)
+        > If `naive` algorithm is selected then this filter option is omitted.  
+        > Cluster in this case is defined either by umi sequences + mapping position (`umi` algorithm)  
         > or just mapping position (`position` algorithm)
 
     1. Setting allowed maximum number of errors detected in read:
@@ -184,7 +184,8 @@ MAIN:
         max_mutations_per_read: 3
         ```
 
-    1. If __true__  error is found between many clusters it might indicate that reference sequence is not correct. To omit such errors provide upper threshold:
+    1. If __true__  error is found between many clusters it might indicate that reference sequence is not correct.  
+      To omit such errors provide upper threshold:
 
         ```yaml
         referece_mutation: 0.95   # how many same mutations at position to consider as reference mistake.
@@ -206,7 +207,7 @@ MAIN:
         genetic_code: 11
         ```
 
-        > In that case you need to pass a csv file with 'Chromosome,Start,End,Gene,Strand'. Coordinates are one based and inclusive.
+        > In that case you need to pass a csv file with 'Chromosome,Start,End,Gene,Strand'. Coordinates are one based and inclusive.  
         > With a third option you can tell which table to use for translation (BioSequences.ncbi_trans_table).
 
     1. You can also pass additional script parameters:
@@ -232,3 +233,12 @@ MAIN:
         min_cluster_counts: 1     # Minimum count of clusters for the mutation to be reported to a single_mutations file.
         min_mutation_coverage: 1  # Minimum confident coverage for the mutation to be reported to a single_mutations file.
         ```
+
+## Disclaimer
+
+This repository is intended to be used as a supplement for scholarly publication.  
+As such, this repository is made available “as-is”. Maintenance and support for this repository is not available at this time.
+
+## License
+
+[MIT](LICENSE)
