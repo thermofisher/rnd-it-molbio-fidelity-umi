@@ -1,5 +1,10 @@
 # MuA-based Molecular Indexing for Rare Mutation Detection by Next-Generation Sequencing
 
+## Disclaimer
+
+This repository is intended to be used as a supplement for scholarly publication.  
+As such, this repository is made available “as-is”. Maintenance and support for this repository is not available at this time.
+
 ## Description
 
 This code was used to generate [MuA-based Molecular Indexing for Rare Mutation Detection by Next-Generation Sequencing]("") publication data.  
@@ -233,11 +238,6 @@ MAIN:
         min_cluster_counts: 1     # Minimum count of clusters for the mutation to be reported to a single_mutations file.
         min_mutation_coverage: 1  # Minimum confident coverage for the mutation to be reported to a single_mutations file.
         ```
-
-## Disclaimer
-
-This repository is intended to be used as a supplement for scholarly publication.  
-As such, this repository is made available “as-is”. Maintenance and support for this repository is not available at this time.
 
 ## License
 
